@@ -1,0 +1,324 @@
+---
+title: "MA5832: Data Mining & Machine Learning"
+subtitle: "Collaborate Week 2: Optimisation & Probability"
+author: "Martha Cooper, PhD"
+institute: "JCU Masters of Data Science"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r xaringan-themer, include = FALSE}
+library(xaringanthemer)
+mono_accent(
+  base_color = "#045a8d",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("IBM Plex Mono")
+)
+```
+
+```{r, include = F}
+#library(ggplot2)
+#library(dplyr)
+```
+
+## Housekeeping
+
++ Collaborates = **Thursdays 6-7:30pm** 
+
+For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
+
+**https://github.com/MarthaCooper/MA8532**
+
+.center[
+
+<img src="Pics/download_github.png" style="width: 50%" />
+
+]
+
+---
+
+## Today's Goals
+
+
++ Optimisation
+    + Gradient Descent
+
++ Probability 
+
+---
+layout: false
+class: inverse, middle, center
+
+## Optimisation
+
+---
+
+## Formal Definition of Optimisation
+
+**Optimisation** is the selection of a best elements from an available set of alternatives. The mathematical notation for finding $x^*$ which *minimises* the *loss function* $f(x)$ is
+
+$x^* = arg\displaystyle\min_{x^*} f(x)$
+
++ We are going to learn an unconstrained optimisation algorithm called **gradient descent**.
+
++ Extension: look up **Newton's method** & more... 
+
+---
+## Optimisation in the context of machine learning
+
+1. Define a **Loss Function** 
+2. Use **Optimisation** to minimise the Loss Function
+
+*e.g.* **Gradient Descent**
+
+Important for decision trees, SVM, neural networks
+
+
+---
+
+## Why use optimisation? 
+
++ Can be used to estimate parameters in statistical & machine learning models
++ We will use an example - Linear Regression. 
++ Note: There are many ways to estimate parameters for Linear Regression and [other methods for estimated linear regression parameters are generally preferred over optimisation](https://stats.stackexchange.com/questions/160179/do-we-need-gradient-descent-to-find-the-coefficients-of-a-linear-regression-mode), but I found this  a useful way learn about optimisation & gradient descent intuitively...
+
+.center[
+
+<img src="Pics/linear_reg_gd.jpg" style="width: 60%" />
+
+]
+
+---
+
+## Optimisation with Gradient Descent
+
+Gradient Descent is an iterative algorithm to find the minimum of a function. 
+
+.center[
+
+<img src="Pics/mountain.jpg" style="width: 60%" />
+
+]
+
+1. ... how to find the gradient? 
+2. ... how to find the speed? 
+
+---
+
+## Optimisation with Gradient Descent
+
+Gradient Descent is an iterative algorithm to find the minimum of a function. 
+
+.center[
+
+<img src="Pics/mountain.jpg" style="width: 60%" />
+
+]
+
+1. ... how to find the gradient? **First derivative**
+2. ... how to find the speed? **Learning Rate**
+
+---
+
+## The First Derivative - Revision
+
++ **Rate of Change**
++ The derivative of a function $y=f(x)$ of a variable is a measure of the rate at which the value $y$ changes with respect to the change in $x$
+
+.center[
+
+<img src="Pics/differentiation.jpg" style="width: 70%" />
+
+]
+
+---
+
+## Using The First Derivative for Optimisation
+
+The first derivative is useful for optimisation because it computes the direction of the slope of the function and **we can use it to find the minimum point of the function**.
+
+.center[
+
+<img src="Pics/diff_grad.jpg" style="width: 60%" />
+
+]
+
++ x < 2 then f'(x) < 0
++ x > 2 the f'(x) > 0 
+---
+
+## Differentiation Rules
+
+.center[
+
+<img src="Pics/rules.png" style="width: 30%" />
+
+[onlinemathlearning](https://www.onlinemathlearning.com/power-rule.html)
+]
+
+Extension = multivariate functions/partial derivative
+
+---
+
+## Gradient Descent Algorithm
+
+1. Define a starting point for the variable(s) we want to optimise, and define a learning rate. *Given a starting point* $x^{(k)}, k = 0$. *Let the Learning Rate be defined as* $\alpha_k$.
+
+2. Calculate the (partial) derivative of the loss function. *Find the gradient of* $f'(x)^{(k)}$
+
+3. Update our current value of $x^{(k)}$ to $x^{(k+1)}$ using the equation
+$x^{(k+1)} = x^{(k)} - \alpha_kf'(x^{(k)})$
+
+4. Repeat steps 2 - 4 a large number of times. 
+
+---
+
+## Applying gradient descent to linear regression (intecept fixed at 0)
+
+.center[
+
+<img src="Pics/workflowgd.jpg" style="width: 80%" />
+
+]
+
+---
+
+## Gradient Descent in R
+
+```{r, eval = F}
+# Goal is to estimate m in a simple linear regression y = mX using Gradient Descent
+# Won't all fit on this slide so check the .rmd! 
+
+lm_gd<-function(x, # vector of x values
+                y, # vector of y values
+                m0, # starting point for m
+                step.size=0.05, # learning rate (equivalent to alpha in gradient descent)
+                max.iter=100, # repeat process 100 times (higher iteration => global optimum)
+                changes=0.001){# if the gradient is smaller than the threshold (changes), stop
+                               # go back and re-run the function before continuing to next iteration
+
+  # Store the values of m across number of iterations
+    m<-matrix(0, ncol=1, nrow=max.iter) # matrix to store parameter estimates
+    d_m <- matrix(0, ncol = 1, nrow=max.iter) # matrix to store gradients d_m
+    
+  # Step 1 in Gradient Descent method  
+    m[1,]<-m0 #set first variable to 0
+    
+    for(i in 1:(max.iter-1)){
+      yhat <- m[i,1]*x #calculate yhats for all xs and m0
+
+      # Step 2: calculate the gradient of the loss function using the derivative of the 
+      #the loss function with respect to m
+      d_m[i,1] <- -2*mean(x*(y-yhat))
+
+      # Step 3: update m according to m = m-L*D_m
+      m[i+1,1] <- m[i,1]-step.size*d_m[i,1]
+    
+      if(i>1 & all(abs(d_m)< changes)){
+        i=i-1
+        break;
+      }
+    }
+
+  # Return results
+  gd_output <- data.frame("i" = seq(1:max.iter), "m" = m, "d_m" = d_m)
+  return(gd_output)
+}
+
+
+```
+
+---
+
+## Application in R
+
+```{r, eval = F}
+#simulate some data with c = 0
+x <- rnorm(40, mean = 0, sd = 1)
+y <- 3*x+0+rnorm(40,0,2)
+plot(x,y) #plot
+
+l <- lm_gd(x,y,m0=0, step.size = 0.001, max.iter = 10000) #lm with gd
+
+plot(l$d_m, l$m) #plot results
+tail(l) #view results
+
+plot(x,y) #plot
+abline(0, 3.18) #fit linear regression line
+
+#calculate the loss function for each value of m 
+
+l$loss <- 0
+for(i in 1:nrow(l)){
+  l$loss[i] <- mean((y-(l$m[i]*x))^2)
+}
+
+plot(l$m, l$loss)
+
+```
+
+---
+
+## Extensions
+
+- What happens when you change the step size? 
+- How do you also choose the best value for the intercept? (clue: partial derivatives)
+
+---
+layout: false
+class: inverse, middle, center
+
+## Probability
+
+---
+## Probability Review
+
++ A discrete random variable has a countable number of possible values.
+    + Discrete uniform distributions
+    + Binomial distribution
+    + Poisson distribution
+    
++ A continuous random can take on any value within a range of values. 
+    + Normal distribution
+    + t-distribution
+    + uniform distribution
+
+---
+
+## Probability Distribution Functions
+
+.center[
+
+<img src="Pics/prob.jpg" style="width: 80%" />
+
+]
+
+---
+
+## Extra reading/watching
+
+**Optimisation**
++ [Essence of Calculus by 3Blue1Brown](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr)
++ [Towards Data Science Demystifying Optimisation](https://towardsdatascience.com/demystifying-optimizations-for-machine-learning-c6c6405d3eea#:~:text=Optimization%20is%20the%20most%20essential,or%20the%20other%20optimization%20routine.)
+
+**Probability**
++ [Chapter 3 Deep Learning by Goodfellow, Bengio & Courville](https://www.deeplearningbook.org/)
+
+---
+
+## References
+
++ [Towards Data Science](https://towardsdatascience.com/linear-regression-using-gradient-descent-97a6c8700931)
+
+**Slides**
++ xaringhan, xaringanthemer, remark.js, knitr, R Markdown
