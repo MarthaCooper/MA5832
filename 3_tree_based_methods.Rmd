@@ -1,0 +1,420 @@
+---
+title: "MA5832: Data Mining & Machine Learning"
+subtitle: "Collaborate Week 3: Tree Based Methods"
+author: "Martha Cooper, PhD"
+institute: "JCU Masters of Data Science"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r xaringan-themer, include = FALSE}
+library(xaringanthemer)
+mono_accent(
+  base_color = "#045a8d",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("IBM Plex Mono")
+)
+```
+
+```{r, include = F}
+#library(ggplot2)
+#library(dplyr)
+```
+
+## Housekeeping
+
++ Collaborates = **Thursdays 6-7:30pm** 
+
+For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
+
+**https://github.com/MarthaCooper/MA8532**
+
+.center[
+
+<img src="Pics/download_github.png" style="width: 50%" />
+
+]
+
+---
+
+## Today's Goals
+
++ Regression Trees
+
++ Decision Trees
+
++ Bagging
+
++ Random Forest
+
++ Boosting
+
+---
+layout: false
+class: inverse, middle, center
+
+## Tree Based Methods
+
+---
+
+### Tree Based Methods
+
++ Split samples into groups
++ Test homogeneity or purity of each group
++ Split again
+
+.center[
+
+<img src="Pics/tree_example.png" style="width: 60%" />
+
+[New York Times](https://archive.nytimes.com/www.nytimes.com/imagepages/2008/04/16/us/20080416_OBAMA_GRAPHIC.html)
+
+[Jeff Leek's Practical Machine Learning](https://www.coursera.org/learn/practical-machine-learning)
+]
+
+
+
+---
+
+## Tree Based Methods 
+
++ **CART** = **classification** & **regression** trees
+
++ Stratifying or segmenting predictor spare into a number of simple regions
+
++ The set of splitting rules used to segment predictor space can be summarized as a *tree* or dendrogram.
+
++ Trees are simple and easy to interpret, but have poor predictive accuracy.
+
++ **Bagging**, **Random Forest** and **Boosting** are all approaches that combine multiple trees together to yield a consensus prediction. This improves predictive accuracy at the cost of interpretation. 
+
+---
+
+## Regression Trees 
+
++ Predicting a continuous response
++ Predicting baseball player's salaries using the number of years playing major league baseball and the number of hits made in the previous year. 
+
+.pull-left[
+
+Regression Tree
+
+<img src="Pics/baseball_tree.png" style="width: 80%" />
+
+]
+
+.pull-right[
+
+Three-region partition
+
+<img src="Pics/baseball_partition.png" style="width: 80%" />
+
+]
+
+Predicted salaries are given by the **mean value** for players in each region.
+
+---
+
+## Tree terminology 
+
++ **Root node**: no incoming edge, zero or more outgoing edges
++ **Internal node**: one incoming edge, two (or more) outgoing edges
++ **Leaf or Terminal node**: each leaf node is assigned a class label, contain a response variable, $y$
++ **Parent and Child nodes**: If a node is split, we refer to that node as a parent node, and the resulting nodes are called child nodes. 
++ **Branches**: Segments that connect the nodes. 
+
+.center[
+
+<img src="Pics/tree_term.png" style="width: 70%" />
+
+]
+
+---
+
+## Building a regression tree
+
+1. Divide the predictor space into $j$ distinct and non-overlapping regions $R_1, R_2,...,R_j$
+2. For every observation in region $R_j$ we make the same prediction - the mean on the response values for training observations
+
+
+
+
++ Regions $R_1, R_2,...,R_j$ are high-dimensional rectangles or *boxes*
+
++ Loss function: $\sum_{j=1}^{J}\sum_{i\in R_j} (y_i - \hat{y}_{R_j})^2$
+
++ where $\hat{y}_{R_j}$ is the mean response for observation in the $j$th region. 
+
++ **Greedy** algorithm - looks for best split at each step.
+
+---
+
+## Classification Trees
+
++ Predicting a qualitative response
+
++ Different loss functions to measure class impurity or at each node, $m$
+
++ Gini Index: $1-\sum_{k=1}^{K} (\hat{p}_{mk})^2$
+
++ Cross entropy: $-\sum_{k=1}^{K} \hat{p}_{mk}log\hat{p}_{mk}$
+
++ where $\hat{p}_{mk} = \frac{1}{N_m}\sum_{x_i \in R_m} I(y_i=k)$, or the proportion of observations in the $m$th region that are from the $k$th class
+
+---
+
+## An example
+
+.center[
+
+<img src="Pics/gini_eg.jpg" style="width: 80%" />
+
+]
+
+---
+
+## Regression Trees in R
+
+```{r, eval = F}
+library(ggplot2) #for plotting
+library(caret) #for trees
+library(rattle)
+
+data(iris) #get data
+head(iris) #view data
+table(iris$Species) #groups to classify
+set.seed(6)
+test_index <- createDataPartition(iris$Species, p = 0.3, list = F)
+training <- iris[-test_index, ] #training and test splits
+testing <- iris[test_index, ]
+set.seed(6)
+fit1 <- train(Species ~., method = "rpart", data = training) #fit model
+fancyRpartPlot(fit1$finalModel) #plot
+preds <-predict(fit1, newdata = testing) #make predictions
+table(preds, testing$Species) #compare preds
+
+```
+
+---
+
+## CART Summary
+
++ Non-linear models
+
++ Easy to interpret
+
++ High variance - sensitive to small changes in training data and not very accurate at making predictions
+
+
+---
+layout: false
+class: inverse, middle, center
+
+## Bagging, Random Forest and Boosting
+
++ Making more powerful prediction models
+
+---
+
+## Bagging
+
+**Bootstrap Aggregation** = **Bagging**
+
+
+1. *Bootstrap* the samples = draw many random samples with replacement
+
+2. Refit the model (note: *any* model) to the bootstrapped samples and **aggregate** the results between all models. 
+
+
+.center[
+
+<img src="Pics/bootstrap.jpg" style="width: 60%" />
+
+]
+---
+
+## Bagging Tree
+
++ Bagging can improve the accuracy of unstable models that tend to overfit
+
+.center[
+
+<img src="Pics/bagging.jpg" style="width: 80%" />
+
+]
+
+---
+
+## *Out-of-Bag* Error Estimation
+
++ Estimating the error of a bagged model
+
++ Each bagged tree uses ~2/3rd of the training data
+
++ The remaining ~1/3rd are called *Out-of-Bag* observations
+
++ We can predict the response for the $i$th observation using each of the trees for with that sample was *OOB*
+
++ We then take the majority vote/ average result to get a prediction for that sample. 
+
++ Compile results to get overall estimate of OOB error. 
+
+---
+## *Out-of-Bag* Error Estimation
+
+.center[
+
+<img src="Pics/OOB_error.png" style="width: 80%" />
+
+[OOB Error](https://en.wikipedia.org/wiki/Out-of-bag_error)
+]
+
+---
+
+## Bagging in R
+
+```{r, eval = F}
+set.seed(6)
+fit2 <- ipred::bagging(Species~., data = training, coob = T, nbagg = 10) #fitted tree with bagging
+preds <<- predict(fit2, testing)
+table(preds, testing$Species)
+```
+
+---
+
+## Random Forests
+
++ Similar to bagging trees
+
++ At each split, a random sample of $m$ predictors is chosen as split candidates from the full set of $P$ predictions
+
++ We can select a value of $m$ to start (e.g. $\sqrt P$), and tune by cross-validation
+
++ Why?
+
+---
+
+## Random Forests
+
++ Similar to bagging trees
+
++ At each split, a random sample of $m$ predictors is chosen as split candidates from the full set of $P$ predictions
+
++ We can select a value of $m$ to start (e.g. $\sqrt P$), and tune by cross-validation
+
++ Why? *Decorrelates* the trees
+
+---
+
+## Random Forests
+
+
+.center[
+
+<img src="Pics/RF.jpg" style="width: 80%" />
+
+]
+
+---
+
+## Random forest in R
+
+```{r, eval = F}
+tc <- trainControl(method = "repeatedcv", number = 10, repeats  = 3) #set up train control for caret
+tg <- expand.grid(mtry = seq(2,ncol(training)-2,1)) #set up tunegrid
+set.seed(6)
+fit3 <- train(Species ~., method = "rf", data = training, trControl = tc, tuneGrid = tg) #fit model
+fit3$finalModel
+randomForest::getTree(fit3$finalModel, k = 3) #get individual trees
+preds <- predict(fit3, testing) #make predictions
+table(preds, testing$Species) #compare predictions
+plot(varImp(fit3, scale = F)) #variable importance
+```
+
+---
+
+## Boosting
+
+Note: *not just for trees*, but we will focus on trees here
+
++ Combine weak learners to create strong learners. A weak learning is a classifier that performs poorly, but is still better than a random guess.
+
++ Weak the weak learners and add them up
+
++ Sequential - each tree is grown using information from the previous tree. This is an iterative process , where samples in the training set are re-weighted at each iteration, so that the second iteration can correct errors from the model in the first iteration. Trees are added until the training set is predicted perfectly 
+
+*e.g.* AdaBoost & Gradient Boosting
+
+---
+
+## Adaboost for Decision Trees
+
+1. Combine weak learners (small trees or stumps) to create strong learners.
+
+2. Each individual tree is weighted based on how well it classifies samples 
+
+3. Each sequential tree learns from the previous tree's mistake by adjusting the weight of samples. If the observation is misclassified by the previous tree, the weight of the observation increases; conversely, the weight decreases if correctly classified. The updated weights are then used in the next iteration for tree fitting. 
+
+---
+
+## Adaboost for Decision Trees
+
+.center[
+
+<img src="Pics/boost1.jpg" style="width: 60%" />
+
+]
+
+.center[
+
+<img src="Pics/boost2.jpg" style="width: 80%" />
+
+]
+
+---
+
+## Gradient boosting
+
+.center[
+
+<img src="Pics/gradient_boost.png" style="width: 80%" />
+
+]
+
+---
+
+## Boosting in R
+
++ [gbm](https://cran.r-project.org/web/packages/gbm/gbm.pdf)
+
++ [xgboost](https://cran.r-project.org/web/packages/xgboost/xgboost.pdf)
+
+Homework to try this in R... 
+
+---
+
+## Extra reading
+
++ [Chapter 8 ISLR](https://www.statlearning.com/)
++ [Chapters 9.2 & 10 ESL](https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
++ StatQuest!
+
+---
+
+## References
+
++ [Chapter 8 ISLR](https://www.statlearning.com/)
++ [Jeff Leek's Practical Machine Learning](https://www.coursera.org/learn/practical-machine-learning)
+
+**Slides**
++ xaringhan, xaringanthemer, remark.js, knitr, R Markdown
