@@ -1,0 +1,419 @@
+---
+title: "MA5832: Data Mining & Machine Learning"
+subtitle: "Collaborate Week 4: Support Vector Machines (SVM)"
+author: "Martha Cooper, PhD"
+institute: "JCU Masters of Data Science"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r xaringan-themer, include = FALSE}
+library(xaringanthemer)
+mono_accent(
+  base_color = "#045a8d",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("IBM Plex Mono")
+)
+```
+
+```{r, include = F}
+#library(ggplot2)
+#library(dplyr)
+```
+
+## Housekeeping
+
++ Collaborates = **Thursdays 6-7:30pm** 
+
+For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
+
+**https://github.com/MarthaCooper/MA8532**
+
+.center[
+
+<img src="Pics/download_github.png" style="width: 50%" />
+
+]
+
+---
+
+## Today's Goals
+
++ Support Vector Machines (SVM)
+
++ Assessment 1 Common Mistakes/Q&A
+
+---
+layout: false
+class: inverse, middle, center
+
+## Support Vector Machines (SVM)
+
+---
+
+### SVM
+
++ Support Vector Machines
+
+    + Classification using **Hyperplanes**
+    
+    + **Maximal Margin Classifier** (linear decision boundary)
+    
+    + **Support Vector Classifiers** (*linear* decision boundary, *soft margin*)
+    
+    + **Support Vector Machine** (supports *non-linear decision boundary*)
+    
+
+---
+### Classification using hyperplanes
+
++ Classification setting - 2 groups
+
++ Try to find a **hyperplane** that separates the classes in feature space
+
+.center[
+
+<img src="Pics/hyperplane.png" style="width: 60%" />
+
+]
+
+---
+### Classification using hyperplanes
+
++ A hyperplane in $p$ dimensions is a set of points $(x_1,...X_p)$ that satisfy a linear equation $\beta_0+\beta_1X_1+...+\beta_pX_p = 0$
+
++ $p = 2$ ?
+
++ Classification using hyperplanes
+    + $f(X) = \beta_0+\beta_1X_1+...+\beta_pX_p$
+    
+    + $f(X) > 0$ - all points of one side of the hyperplane
+    
+    + $f(X) < 0$ - all points on the other side of the hyperplane
+    
+    + $f(X) = 0$ defines the **separating hyperplane**
+    
+---
+
+### Classification using hyperplanes
+
+.center[
+
+<img src="Pics/hyperplane_classif.jpg" style="width: 60%" />
+
+]
+
+
+---
+
+### Maximal margin classifier 
+
+.pull-left[
+
++ Amongst all separating hyperplanes, it is the one for which the margin is largest 
+
++ It has the farthest minimum distance to the training observations.
+
++ Points $A, B, C$ that lie on the margins are called **support vectors**
+
++ The distance between these points and the hyperplane is called $d$. The **Margin**, $M$ , is twice the absolute distance of $d$. 
+
+]
+
+.pull-right[
+
+<img src="Pics/mmc.jpg" style="width: 80%" />
+
+]
+
+---
+
+### Maximal margin classifier 
+
++ How to find the optimal hyperplane for classification where $y \in \{1, -1\}$?
+
+**Optimisation** problem: 
++ $maximise_{\beta_0, \beta_1,..., \beta_p}\hspace{0.5cm} M$
+    + Maximise the width of the margin 
+    
++ $subject\hspace{0.1cm} to \hspace{0.5cm} \sum^p_j \beta^2_j = 1$
+    + Find a unique hyperplane, and define the perpendicular distance between any point, $i$, and the hyperplane
+    
++ $y_i(\beta_0 + \beta_1x_{i1} + ... + \beta_px_{ip}) \geq M \hspace{0.5cm} \forall \hspace{0.1cm} i = 1, ...,n$
+    + Make sure that each observation will be on the correct side of the margin
+
+---
+
+### Support Vector Classifier & Soft Margins 
+
++ Sometimes the data are separable, but noisy. 
++ Sometimes the data aren't perfectly separable
+
++ We might want to use a hyperplane that *almost* separates the classes, called a **soft margin**
+
++ This extension of the *Maximal Margin Classifier* is called a **Support Vector Classifier**
+
+.pull-left[
+#####Non-Separable
+<img src="Pics/nonsep.jpg" style="width: 60%" />
+
+]
+
+.pull-right[
+#####Noisy
+<img src="Pics/noisy.jpg" style="width: 120%" />
+
+]
+---
+
+### Support Vector Classifier & Soft Margins 
+
+.center[
+
+<img src="Pics/soft_margins.jpg" style="width: 100%" />
+
+]
+
+---
+### Support Vector Classifier & Soft Margins
+
++ How to find the optimal soft margin hyperplane for classification where $y \in \{1, -1\}$?
+
+**Optimisation** problem
+
++ $maximise_{\beta_0, \beta_1,..., \beta_p}\hspace{0.5cm} M$
+
++ $subject\hspace{0.1cm} to \hspace{0.5cm} \sum^p_j \beta^2_j = 1$
+
++ $y_i(\beta_0 + \beta_1x_{i1} + ... + \beta_px_{ip}) \geq M(1-\epsilon_i)$,
+ $\hspace{0.5cm} \epsilon_i \geq 0$, $\hspace{0.5cm} \sum^n_{i=1} \epsilon_i \leq C$
+
+
++ where $C$ is the permissible misclassification (a tuning parameter)
+
++ $\epsilon_i,...,\epsilon_n$ are slack variables - they allow observations to be on the wrong side of the margin or hyperplane
+
+---
+### Choosing C
+
+.pull-left[
++ If $C=0$, there is no budget for observations to be misclassified
+
++ C controls the **Bias-Variance trade-off**, and we choose it by CV
+
+    + $C$ is small = low bias, high variance
+    
+    + $C$ is large = high bias, low variance
+]
+.pull-right[
+
+<img src="Pics/chooseC.jpg" style="width: 100%" />
+
+]
+    
+---
+
+## Non-Linear Classifification with the Support Vector Machine
+
++ Sometimes a linear boundary won't work regardless of the value of $C$
+
++ What if we enlarged the feature space *i.e.* added extra dimensions? 
+
+.center[
+
+<img src="Pics/expandspace.jpg" style="width: 70%" />
+
+]
+
+
++ The *Support Vector Machine* uses **kernals** to enlarge the feature space, without actually performing any transformations - **Kernal Trick** 
+
+---
+
+## Inner Products
+
++ The solution to the support vector classifier only involves the *inner products* of the observations. 
+
++ Inner products are defined by:
+
++ $\langle x_i, x_{i'}\rangle = \sum^p_{j=1}x_{ij}x_{i'j}$
+
++ The linear support vector classifier can be represented as:
+
++ $f(x) = \beta_0 + \sum^n_{n=1}\alpha_i\langle x,x_i\rangle$
+
+---
+## Inner products & support vectors
+
++ The linear support vector classifier can be represented as:
+
++ $f(x) = \beta_0 + \sum^n_{n=1}\alpha_i\langle x,x_i\rangle$
+
++ The hyperplane only depends on the support vectors. If $S$ is a collection of the support vectors then:
+
++ $f(x) = \beta_0 + \sum_{i \in S}\alpha_i\langle x,x_i\rangle$
+
++ Summary: in representing the linear classifier $f(x)$ and in computing its coefficients, all we need are the inner products.
+---
+
+### The Kernal Trick
+
++ $K$ is a function we will refer to as a Kernal. The non linear support vector classifier can be presented as
+
++ $f(x) = \beta_0 + \sum_{i \in S}\alpha_iK\langle x,x_i\rangle$
+
++ Kernals for non-linear Support Vector Machines
+
+    + Polynomial kernal $K\langle x, x_{i'}\rangle = (1+\sum^p_{j=1}x_{ij}x_{i'j})^d$
+    
+    + Radial kernal $K\langle x, x_{i'}\rangle = exp(- \gamma\sum^p_{j=1}(x_{ij}x_{i'j})^2)$ where $\gamma$ is a positive constant.
+    
+---
+## SVM with polynomial and radial kernals
+
+.center[
+
+<img src="Pics/kernals.jpg" style="width: 100%" />
+
+]
+
+
+---
+
+## SVM in R 
+
+Can you build a machine learning model to accurately predict whether or not the patients in the dataset have diabetes or not?
+
+.center[
+
+<img src="Pics/diabetes.png" style="width: 50%" />
+
+]
+
+
+
+Discuss Approaches... 
+
+---
+
+### To scale or not to scale? 
+
++ Tree based methods
+
++ SVM
+
++ Neural Networks
+
+
+
+---
+
+### To scale or not to scale? 
+
++ Tree based methods
+
++ SVM
+
++ Neural Networks
+
+Optimisation problems = error inflation if variables on larger scales
+
+---
+
+## SVM in R
+Check .Rmd, not all code on slide... 
+
+```{r, eval = F}
+library(caret) # to fit svm
+library(mlbench) # to obtain data
+data("PimaIndiansDiabetes2", package = "mlbench") #diabetes dataset
+
+# Exploratory Analysis
+###Checks 
+####- missing values
+####- distribution/skewness
+####- outliers
+####- diagnostic plots 
+head(PimaIndiansDiabetes2)
+summary(PimaIndiansDiabetes2) 
+df <- na.omit(PimaIndiansDiabetes2)
+summary(df)
+
+# Defining test and training data
+#### Why?
+set.seed(6)
+test_index <- createDataPartition(df$diabetes, p = 0.3, list = F)
+traindat  <- df[-test_index,]
+testdat <- df[test_index,]
+
+# set up cross validation
+#### Why?
+train_control <- trainControl(method="repeatedcv",
+                              number=10, repeats=3)
+
+#Maximal Margin Classifier (linear, no soft margin, C=1)
+set.seed(6)
+svm1 <- train(diabetes ~., 
+              data = traindat,
+              method = "svmLinear", 
+              trControl = train_control,  
+              preProcess = c("center","scale"))
+
+svm1
+#make predictions
+preds1 <- predict(svm1, newdata = testdat)
+confusionMatrix(table(preds1, testdat$diabetes))
+
+#Support Vector Classifier (linear, soft margin)
+svm2 <- train(diabetes ~., 
+              data = df,
+              method = "svmLinear", 
+              trControl = train_control, 
+              preProcess = c("center","scale"),
+              tuneGrid = expand.grid(C = seq(0, 2, length = 20)))
+
+svm2
+preds2 <- predict(svm2, newdata = testdat)
+confusionMatrix(table(preds2, testdat$diabetes))
+
+#Support Vector Machine (radial)
+svm3 <- train(diabetes ~., data = df, method = "svmRadial", 
+              trControl = train_control,
+              preProcess = c("center","scale"), tuneLength = 10)
+svm3
+preds3 <- predict(svm3, newdata = testdat)
+confusionMatrix(table(preds3, testdat$diabetes))
+
+# Homework compare the performance of the three approaches
+```
+
+---
+
+### Extra reading
+
++ [Chapter 9 ISLR](https://www.statlearning.com/)
++ [Chapters 12 ESL](https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
+
+### Extra watching
+
++ The linear algebra we missed: [MIT Learning: Support Vector Machines](https://www.youtube.com/watch?v=_PwhiWxHK8o)
++ General Intro: [StatQuest: SVM](https://www.youtube.com/watch?v=efR1C6CvhmE)
+
+---
+
+## References
+
++ [Chapter 9 ISLR](https://www.statlearning.com/)
+
+**Slides**
++ xaringhan, xaringanthemer, remark.js, knitr, R Markdown
