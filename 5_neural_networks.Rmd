@@ -1,0 +1,437 @@
+---
+title: "MA5832: Data Mining & Machine Learning"
+subtitle: "Collaborate Week 4: Neural Networks"
+author: "Martha Cooper, PhD"
+institute: "JCU Masters of Data Science"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r xaringan-themer, include = FALSE}
+library(xaringanthemer)
+mono_accent(
+  base_color = "#045a8d",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("IBM Plex Mono")
+)
+```
+
+## Housekeeping
+
++ Collaborates = **Thursdays 6-7:30pm** 
+
+For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
+
+**https://github.com/MarthaCooper/MA8532**
+
+.center[
+
+<img src="Pics/download_github.png" style="width: 50%" />
+
+]
+
+---
+
+## Today's Goals
+
++ Structure of Neural Network (NN)
+
++ Estimation of NN
+
++ Training a neural network using Keras
+
+---
+
+layout: false
+class: inverse, middle, center
+
+## Neural Networks
+
+---
+
+## Deep Learning and Neural Networks
+
+.center[
+
+<img src="Pics/deep.jpg" style="width: 90%" />
+
+]
+
+---
+
+## Neural Networks
+
++ Recognise and predict relationships in data using algorithms that are inspired by the way the human brain works. 
+
++ Many different types of NN: 
+
+    + **Vanilla Neural Network**
+    
+    + Recurrent Neural Network *e.g.*  Long short term memory network *Natural language processing, time series*
+    
+    + Convolution Neural Network - *Computer vision*
+
+---
+
+## Topology of a (vanilla) Neural Network
+
+.center[
+
+<img src="Pics/nn.png" style="width: 90%" />
+
+[kdnuggets](https://www.kdnuggets.com/2019/11/designing-neural-networks.html)
+
+]
+
+---
+
+## A single NN unit - the perceptron
+
+.center[
+
+<img src="Pics/perceptron.jpg" style="width: 90%" />
+
+]
+
+---
+
+## Activation Functions
+
+```{r echo=FALSE}
+library(ggplot2)
+library(sigmoid)
+sigmoid <- function(x){
+  1/(1+exp(-x))
+}
+x <- seq(-5,5,0.01)
+sig_plot<-data.frame("x" = x, "sigmoid_x" = sigmoid(x))
+a <- ggplot(sig_plot, aes(x = x, y = sigmoid_x))+
+  geom_line()+
+  ylab("f (x)")+
+  ggtitle("Sigmoid")
+
+relu_plot<-data.frame("x" = x, "sigmoid_x" = relu(x))
+b <- ggplot(relu_plot, aes(x = x, y = sigmoid_x))+
+  geom_line()+
+  ylab("f (x)")+
+  ggtitle("ReLU")
+
+egg::ggarrange(a,b, nrow= 1)
+
+```
+
+---
+
+## Classification using a perceptron
+
+.pull-left[
+
+<img src="Pics/classif_perceptron.jpg" style="width: 100%" />
+
+]
+
+.pull-right[
+
+```{r echo=FALSE}
+x <- seq(-10,10,1)
+plot(x,x, type = "n", ylab="x_2", xlab="x_1")
+abline(-0.5, -1.5)
+title("1 + 3x_1 + 2x_2 = 0")
+
+```
+
+]
+
+---
+
+## Classification using a perceptron
+
+.pull-left[
+
+<img src="Pics/classif2.jpg" style="width: 100%" />
+
+]
+
+.pull-right[
+
+```{r echo=FALSE}
+x <- seq(-10,10,1)
+plot(x,x, type = "n", ylab="x_2", xlab="x_1")
+abline(-0.5, -1.5)
+title("1 + 3x_1 + 2x_2 = 0")
+points(x = 1, y = 2)
+text(2,3, "1,2")
+text(7,7, "z > 0")
+text(7,5, "y > 0.5")
+text(-7,-7,  "y < 0.5")
+text(-7,-5,"z < 0")
+```
+
+]
+
+---
+
+## Building Neural Networks from Perceptrons
+
+.center[
+
+<img src="Pics/nn.png" style="width: 90%" />
+
+[kdnuggets](https://www.kdnuggets.com/2019/11/designing-neural-networks.html)
+
+]
+
+---
+
+## Training Neural Networks
+
+What do we need to estimate to train a neural network?
+
+How do we estimate those parameters?
+
+---
+
+## Training Neural Networks
+
+What do we need to estimate to train a neural network?
+
++ All weights and biases for all neurons in the network
+    
+    
+How do we estimate those parameters?
+
+1.  Loss function to quantify error *e.g.* Regression = MSE = $\mathcal{L} = \frac{1}{n} \sum^n_{i=1} (y_i - \hat{y_i})^2$
+
+2. Solve using optimisation *e.g.* Stochastic gradient descent
+---
+
+## Calculating Gradients using Backpropogation
+
+.center[
+
+<img src="Pics/back_prop.jpg" style="width: 90%" />
+
+]
+
+Repeat for all weights in the network... 
+
+---
+
+## Optimisation methods
+
+.pull-left[
+
++ [Stocastic gradient descent](https://www.jstor.org/stable/2236690?seq=1#metadata_info_tab_contents)
++ [Adam](https://arxiv.org/abs/1412.6980)
++ [AdaDelta](https://arxiv.org/abs/1212.5701)
+
+.... and more ... 
+
+]
+
+.pull-right[
+
+<img src="Pics/mountains.png" style="width: 100%" />
+[Li et al., 2018](https://arxiv.org/pdf/1712.09913.pdf)
+
+]
+
+---
+
+## Questions
+
++ Which activation function?
++ How many neurons should I choose in a hidden layer?
++ How many hidden layers?
++ Which loss function?
+
+---
+
+## Which activation function?
+
+.pull-left[
+
+##Sigmoid
+
+*Advantages*
+
++ Output values bound between 0 and 1, normalizing the output of each neuron
++ Clear predictions
+
+*Disadvantages*
+
++ Vanishing gradient
++ Computationally expensive
+
+]
+
+.pull-left[
+
+##ReLU
+
+*Advantages*
+
++ Computationally efficient (Sparsity)
++ No vanishing gradient
+
+*Disadvantages*
+
++ The Dying ReLU problem: when inputs approach zero, or are negative, the output becomes zero. The weight and bias cannot be updated
+
+]
+---
+
+## How many neurons should I choose in a hidden layer?
+
++ Trials and error
+
++ Cross-validation approach
+
++ Rule of thumb:
+    + in the range between the number of input and output ;
+    + The number of hidden neurons should be less than twice the number of
+inputs;
+    + the number of hidden neurons should be 2/3 of the number of inputs,
+plus the number of outputs.
+
++ setting nodes equal to $ns/(c*(n_i + n_o))$ where $n_i$ is the number of
+inputs, $n_o$ is the number of outputs. $n_s$ : the number observations of
+training sample. $c$ is between 2 and 10.
+---
+
+## How many hidden layers?
+
++ A single-layer neural network can only be used to represent linearly separable functions. It can be used for a simple issues such as classifying two classes where they can neatly separated by a line.
+
++ A multi-layer NN can be used to represent with more complex issues, and high-dimensional space.
+
+---
+
+## Which Loss function? 
+
+.center[
+
+<img src="Pics/loss_functions.png" style="width: 100%" />
+
+[Towards Data Science](https://towardsdatascience.com/deep-learning-which-loss-and-activation-functions-should-i-use-ac02f1c56aa8)
+
+]
+
+---
+
+## NN in R
+
+Possible packages:
+
++ [neuralnet](https://cran.r-project.org/web/packages/neuralnet/neuralnet.pdf)
++ [Keras](https://keras.rstudio.com/)
++ [Tensorflow](https://tensorflow.rstudio.com/)
++ [Pytorch](https://torch.mlverse.org/)
+
+[Comparison of deep learning frameworks](https://www.simplilearn.com/keras-vs-tensorflow-vs-pytorch-article)
+
+---
+
+## NN in R
+
+.center[
+
+<img src="Pics/mnist.jpeg" style="width: 30%" />
+
+[MNIST database](https://en.wikipedia.org/wiki/MNIST_database)
+
+]
+
++ We use the MNIST dataset which contains 60,000 training images and 10,000 test images. 
++ The goal is to classify greyscale images of handwritten digits (28 x 28 pixels) into their 10 categories (0 through to 9)
+
+---
+
+## NN in R
+
+See Rmarkdown as code doesn't fit on slide... 
+
+```{r eval = F}
+library(keras)
+mnist <- dataset_mnist()
+head(mnist)
+
+train_images <- mnist$train$x
+train_labels <- mnist$train$y
+test_images <- mnist$test$x
+test_labels <- mnist$test$y
+
+# Coverting 28x28 pixel into Tensorflow format
+train_images <- array_reshape(train_images, c(60000, 28 * 28))
+train_images <- train_images / 255 #normalise input to between 0 & 1
+
+test_images <- array_reshape(test_images, c(10000, 28 * 28))
+test_images <- test_images / 255 #normalise input to between 0 & 1
+
+
+# Encode y variable into 0 and 1 
+train_y_mtx <- to_categorical(train_labels)
+test_y_mtx <- to_categorical(test_labels)
+
+# NN structure
+network <- keras_model_sequential() %>%
+  layer_dense(units = 8, activation =  "relu", input_shape = c(28*28)) %>%
+  layer_dense(units = 10, activation =  "softmax")
+
+# Optimisation
+
+network %>% compile(
+  optimizer = "adam", # can be other optimisation problem
+  loss = "categorical_crossentropy",
+  metrics = c("accuracy")
+)
+
+# Train model
+model <- network %>%
+  fit(train_images, train_y_mtx,
+      epochs = 10,
+      batch_size = 50,
+      validation_split = 0.2 )
+plot(model) 
+
+# Prediction
+classes <- network%>% predict_classes(test_images)
+
+# Confusion matrix
+table(test_labels, classes)
+
+
+# Calculating the loss
+score <- network %>% evaluate(test_images, test_y_mtx)
+print(score)
+
+```
+
+---
+
+### Homework
+
++ Install Keras and Miniconda (especially if you have windows!) 
+
+---
+
+### References & Extra reading
+
++ [Deep Learning](https://www.deeplearningbook.org/)
+
+### Extra watching
+
++ [MIT 6.S191: Introduction to Deep Learning](https://www.youtube.com/watch?v=njKP3FqW3Sk&list=PLtBw6njQRU-rwp5__7C0oIVt26ZgjG9NI&index=2)
++ [3b1b Deep Learning](https://www.youtube.com/watch?v=tIeHLnjs5U8)
+
+
