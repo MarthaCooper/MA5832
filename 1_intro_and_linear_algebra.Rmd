@@ -100,16 +100,19 @@ study_plan
 
 2. Extensions
     + Read Section 4 of Course Outline
-    + Requests must be emailed to David **before** the deadline (unless it is an emergency)
+    + Requests must be emailed to Dr. David Donald **before** the deadline (unless it is an emergency)
     
 3. Assessments 1 & 2 Submission Details
     + Must be submitted in **PDF** format
     + Can be written in **.Rmd or word** processor
     + **Appendix with R code** must be attached at the end of the **same PDF** document. 
     
+4. Questions?
+    + MA5832 Discussion board: Nayar Sultana, Corey Lammie, Chinedu Ossai and myself 
+
 4. Questions about collaborates? 
     + Email: **martha.cooper@jcu.edu.au**
-    + MA8510 Discussion board: **Friday & Saturday**
+    + MA5832 Discussion board: **Tuesday & Wednesday**
 
 ---
 
