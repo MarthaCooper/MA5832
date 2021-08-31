@@ -1,0 +1,487 @@
+---
+title: "MA5832: Data Mining & Machine Learning"
+subtitle: "Collaborate Week 1: Intro & Linear Algebra Review"
+author: "Martha Cooper, PhD"
+institute: "JCU Masters of Data Science"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r xaringan-themer, include = FALSE}
+library(xaringanthemer)
+mono_accent(
+  base_color = "#045a8d",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("IBM Plex Mono")
+)
+```
+
+```{r, include = F}
+library(ggplot2)
+library(dplyr)
+```
+
+## Housekeeping
+
++ Collaborates = **Tuesdays 6-7:30pm** 
+
+For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
+
+**https://github.com/MarthaCooper/MA8532**
+
+.center[
+
+<img src="Pics/download_github.png" style="width: 50%" />
+
+]
+
+
+---
+
+## Today's Goals
+
++ Overview of topics covered in MA5832: Study Plan, Assessments & Expectations
+
++ Vectors, Matrices & Linear Algebra
+    + Matrix addition & multiplication
+    + Computing the determinant for 2x2 and 3x3 matrices
+    + Eigenvalues & Eigenvectors
+
+---
+layout: false
+class: inverse, middle, center
+
+## MA5832: Data Mining & Machine Learning
+
+---
+
+## MA5832 Study Plan
+
+```{r echo=FALSE, warning=FALSE}
+study_plan <- data.frame("Weeks" = c(1:6),
+                         "Collaborate_Topics" = c("MA5832 Overview & Linear Algebra",
+                                                  "Probability & Optimisation",
+                                                  "Tree based regression",
+                                                  "Support Vector Machines",
+                                                  "Neural Network",
+                                                  "Capstone Q&A"))
+
+rownames(study_plan) <- NULL
+study_plan
+```
+
+---
+
+## Assessments
+
+*Time management is important!*
+
+**Assessments 1** due 12/09/21 (25%) - *Week 2 topics*
+
+**Assessments 2** due 26/09/21 (35%) - *Week 3 & 4 topics*
+
+**Assessments 3 (Capstone)** due 13/10/21 (40%) *Bring everything together*
+
+---
+
+## Expectations
+
+1. Independent study is **required**. 
+
+2. Extensions
+    + Read Section 4 of Course Outline
+    + Requests must be emailed to David **before** the deadline (unless it is an emergency)
+    
+3. Assessments 1 & 2 Submission Details
+    + Must be submitted in **PDF** format
+    + Can be written in **.Rmd or word** processor
+    + **Appendix with R code** must be attached at the end of the **same PDF** document. 
+    
+4. Questions about collaborates? 
+    + Email: **martha.cooper@jcu.edu.au**
+    + MA8510 Discussion board: **Friday & Saturday**
+
+---
+
+layout: false
+class: inverse, middle, center
+
+## Vectors, Matrices & Linear Algebra
+
++ Understand some basic concepts of linear algebra (revision...!)
+
+---
+
+## Vectors
+
+A **vector** is an array of numbers written as a column and enclosed by square brackets
+
+$$
+\boldsymbol v = 
+\begin{bmatrix}
+           x_{1} \\
+           x_{2} \\
+           \vdots \\
+           x_{m}
+\end{bmatrix}
+$$
+
+This vector, $\boldsymbol v$, contains $m$ elements. If each element of $\boldsymbol v$ is in $\mathbb{R}$, $\boldsymbol v \in \mathbb{R}^m$
+
+---
+
+## Vectors 
+Vectors can be represented geometrically
+
+.center[
+
+<img src="pics/vector_1.jpg" style="width: 50%" />
+
+]
+
+---
+
+## Scalars 
+A scalar is a number *e.g.* $x$ 
+
+.center[
+
+<img src="pics/vector_2.jpg" style="width: 50%" />
+
+]
+---
+
+## Vectors & Scalars in R
+
+$$
+\boldsymbol v = 
+\begin{bmatrix}
+           3 \\
+           5 \\
+           2 \\
+\end{bmatrix}
+$$
+```{r}
+v <- c(3,5,2) #defining a vector
+v
+```
+
+$$
+\boldsymbol g = 3 \boldsymbol v
+$$
+
+```{r}
+g <- 3*v #multiplying a vector by a scalar
+g
+```
+
+---
+
+## Matrices
+
+A **matrix** is a rectangular array of numbers, arranged in rows and columns. An $n\times p$ matrix has $n$ rows and $p$ columns
+
+$$
+\boldsymbol X = 
+\begin{bmatrix}
+           x_{1,1} & x_{2,1} & ... & x_{1,p} \\
+           x_{2,1} & x_{2,1} & ... & x_{2,p}\\
+           \vdots & \vdots & \ddots & \vdots \\
+           x_{n,1} & x_{n,2} & ... & x_{n,p}
+\end{bmatrix}
+$$
+If $\boldsymbol x_{i,j} \in \mathbb{R}$, then $\boldsymbol X \in \mathbb{R}^{n\times p}$
+
++ Rows = Samples/Observations
++ Columns = Variables/Factors/Predictors
+
+---
+
+## Setting up matrices in R
+
+```{r}
+m <- matrix(c(1:9), nrow = 3, ncol = 3, byrow = T)
+m
+```
+
+---
+
+## Matrix Concepts 
+
+**Transpose** 
+
+.center[
+$A^T$
+]
+
+.center[
+
+<img src="pics/transpose.jpg" style="width: 50%" />
+
+]
+
+---
+
+## Matrix Concepts
+
+**Inverse**
+
+.center[
+$\boldsymbol A^{-1}$
+]
+
+With numbers:
+
+$$
+\frac{5}{1} \times \frac{1}{5} = 1 
+$$
+
+We can do the same thing with matrices: 
+
+$$
+\boldsymbol A \boldsymbol A^{-1} = I
+$$
+Where $I$ is the Identity matrix - the 1 equivalent of a matrix
+
+.center[
+
+<img src="pics/inverse.jpg" style="width: 30%" />
+
+]
+
+---
+
+## Matrix Addition 
+
+.center[
+$\boldsymbol A + \boldsymbol B$ 
+]
+
+
+Add the numbers in the matching positions. (& subtraction is the same, because it is the addition of a negative matrix 
+
+.center[
+$\boldsymbol A + (-\boldsymbol B)$
+]
+
+.center[
+
+<img src="pics/addition.jpg" style="width: 50%" />
+
+]
+
+Note: The matrices must be the same size
+
+---
+
+## Multiplying a matrix by a scalar 
+
+.center[
+$xA$
+]
+.center[
+
+<img src="pics/scalar_mult.jpg" style="width: 50%" />
+
+]
+
+---
+
+## Matrix Multiplication 
+
+.center[
+$\boldsymbol A \boldsymbol B$
+]
+
+Take the dot product 
+
+.pull-left[
+
+<img src="pics/dotprod.jpg" style="width: 100%" />
+
+]
+
+.pull-right[
+
+<img src="pics/mult_2.png" style="width: 80%" />
+
+]
+
+The number of columns in the left matrix must equal the number of row in the right matrix
+
+---
+
+## Visualising Matrix Multiplication
+
+Matrix multiplication is a linear transformation which we can see geometrically
+
+.center[
+
+<img src="pics/multgraph.jpg" style="width: 80%" />
+
+]
+---
+
+## Summary of Addition and Multiplication 
+
+
+.center[
+
+<img src="pics/summary.jpg" style="width: 50%" />
+
+]
+
+---
+
+## Determinant of a Matrix 
+
+**Determinant** - describing how linear transformations change area or volume. Also useful for solving linear equations and changing variables integrals. 
+
+.center[
+
+<img src="pics/determinant.jpg" style="width: 50%" />
+
+]
+
+---
+
+## Computing the Determinant
+
+.pull-left[
+*2x2 matrices*
+
+<img src="pics/det_two.jpg" style="width: 100%" />
+
+]
+
+.pull-right[
+*3x3 matrices*
+
+<img src="pics/det_three.jpg" style="width: 100%" />
+
+]
+
+---
+
+## Matrix Concepts in R
+
+```{r, eval = F}
+# a and b are two square matrices
+
+a + b # Addition
+a %*% b # Multiplication
+t(a) # Transpose
+det(a) # Determinant
+solve(a) # Inverse
+```
+
+**Test these for yourself by hand and then using R**
+
+```{r}
+h <- matrix(c(2,7,19,4), nrow = 2, byrow = F)
+g <- matrix(c(1,3,4,2), nrow = 2, byrow = F)
+```
+
+---
+
+## Solving equations using matrices
+
+Matrices make solving linear equations easier/faster
+
+.center[
+
+<img src="pics/lineq.jpg" style="width: 50%" />
+
+]
+
+
+---
+
+## Eigenvalues and Eigenvectors 
+
+In (some) linear transformations, there are vectors that don't change direction and are only scaled (stretched or shrunk) within their own span. 
+
+**Eigenvectors** are the vectors that remain pointing in the same direction.
+**Eigenvalues** are the scalars that the eigenvectors are stretch/shrunk by.
+
+.center[
+
+<img src="pics/eigen.jpg" style="width: 40%" />
+
+]
+
+
+---
+
+## Eigenvectors and Eigenvalues
+
+Almost all vectors change direction when multiplying a matrix, $\boldsymbol A$. **Eigenvectors**, $\boldsymbol x$, are certain vectors that have the same direction as $\boldsymbol Ax$. The **Eigenvalue**, $\lambda$  is the scalar by which $\boldsymbol x$ is *stretched*, *shrunk*, *reversed* or *remained unchanged* when multiplied by $\boldsymbol A$. 
+
+$$
+\boldsymbol A \boldsymbol x = \lambda \boldsymbol x
+$$
+
+We can find eigenvectors and eigenvalues of $\boldsymbol A$ by setting the **determinant** of $\boldsymbol A -\lambda\boldsymbol I$ to be 0. 
+
+$$
+det \mid (\boldsymbol A- \lambda \boldsymbol I)\mid = 0
+$$
+---
+
+## Eigenvector and Eigenvalues in R
+
+```{r}
+mat <- matrix(c(0.5, 0.5, 0.5, 0.5), byrow = T, nrow = 2)
+mat
+```
+
+```{r}
+eigen(mat)
+```
+
+---
+
+## Take what you have learned today and be able to: 
+
++ Perform linear regression using matrices (linear regression from scratch without using ```lm```)
+
++ Calculate eigenvalues and eigenvectors (by hand)
+
+
+---
+
+## Extra reading
+
+**Very stuck?**  
++ [Essence of Linear Algebra by 3Blue1Brown](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
++ [Maths is fun Intro to Matrices](https://www.mathsisfun.com/algebra/matrix-introduction.html)
++ [Lumen Learning Boundless Algebra Intro to Matrices](https://courses.lumenlearning.com/boundless-algebra/chapter/introduction-to-matrices/)
++ [Maths is Fun Eigenvectors and Eigenvalues](https://www.mathsisfun.com/algebra/eigenvalue.html)
+
+**Further Reading**
++ [Chapter 2 Deep Learning by Goodfellow, Bengio & Courville](https://www.deeplearningbook.org/)
+
+---
+
+## References
+
++ [Chapter 2 Deep Learning by Goodfellow, Bengio & Courville](https://www.deeplearningbook.org/)
+
++ [Maths is fun Intro to Matrices](https://www.mathsisfun.com/algebra/matrix-introduction.html)
+
++ [Lumen Learning Boundless Algebra Intro to Matrices](https://courses.lumenlearning.com/boundless-algebra/chapter/introduction-to-matrices/)
+
++ Dr Kelly Trinh MA5832 Week 1:Linear Alegbra
+
+**Slides**
++ xaringhan, xaringanthemer, remark.js, knitr, R Markdown
