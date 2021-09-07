@@ -33,7 +33,7 @@ mono_accent(
 
 ## Housekeeping
 
-+ Collaborates = **Thursdays 6-7:30pm** 
++ Week 2 Collaborates = **Tuesday & Thursday 6-7:30pm** 
 
 For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
 
@@ -53,7 +53,7 @@ For my Collaborate Sessions, you can get the **slides & R code** for each week o
 + Optimisation
     + Gradient Descent
 
-+ Probability 
++ Thursday - Probability revision & Assessment 1 Q&A
 
 ---
 layout: false
@@ -65,13 +65,13 @@ class: inverse, middle, center
 
 ## Formal Definition of Optimisation
 
-**Optimisation** is the selection of a best elements from an available set of alternatives. The mathematical notation for finding $x^*$ which *minimises* the *loss function* $f(x)$ is
+**Optimisation** is the selection of a best elements from an available set of alternatives. The mathematical notation for finding the optimal solution, $x^*$, which *minimises* the *loss function*, $f(x)$, is
 
 $x^* = arg\displaystyle\min_{x^*} f(x)$
 
 + We are going to learn an unconstrained optimisation algorithm called **gradient descent**.
 
-+ Extension: look up **Newton's method** & more... 
++ Extension: look up **Stochastic Gradient Descent, Newton's method** & more... 
 
 ---
 ## Optimisation in the context of machine learning
@@ -81,7 +81,7 @@ $x^* = arg\displaystyle\min_{x^*} f(x)$
 
 *e.g.* **Gradient Descent**
 
-Important for decision trees, SVM, neural networks
+Building block for understanding further topics in this course including neural networks
 
 
 ---
@@ -90,7 +90,7 @@ Important for decision trees, SVM, neural networks
 
 + Can be used to estimate parameters in statistical & machine learning models
 + We will use an example - Linear Regression. 
-+ Note: There are many ways to estimate parameters for Linear Regression and [other methods for estimated linear regression parameters are generally preferred over optimisation](https://stats.stackexchange.com/questions/160179/do-we-need-gradient-descent-to-find-the-coefficients-of-a-linear-regression-mode), but I found this  a useful way learn about optimisation & gradient descent intuitively...
++ *Note*: There are many ways to estimate parameters for Linear Regression and [other methods for estimated linear regression parameters are generally preferred over optimisation](https://stats.stackexchange.com/questions/160179/do-we-need-gradient-descent-to-find-the-coefficients-of-a-linear-regression-mode), but I found this  a useful way learn about optimisation & gradient descent intuitively...
 
 .center[
 
@@ -199,6 +199,7 @@ $x^{(k+1)} = x^{(k)} - \alpha_kf'(x^{(k)})$
 # Goal is to estimate m in a simple linear regression y = mX using Gradient Descent
 # Won't all fit on this slide so check the .rmd! 
 
+
 lm_gd<-function(x, # vector of x values
                 y, # vector of y values
                 m0, # starting point for m
@@ -208,7 +209,7 @@ lm_gd<-function(x, # vector of x values
                                # go back and re-run the function before continuing to next iteration
 
   # Store the values of m across number of iterations
-    m<-matrix(0, ncol=1, nrow=max.iter) # matrix to store parameter estimates
+    m <- matrix(0, ncol=1, nrow=max.iter) # matrix to store parameter estimates
     d_m <- matrix(0, ncol = 1, nrow=max.iter) # matrix to store gradients d_m
     
   # Step 1 in Gradient Descent method  
@@ -248,13 +249,13 @@ x <- rnorm(40, mean = 0, sd = 1)
 y <- 3*x+0+rnorm(40,0,2)
 plot(x,y) #plot
 
-l <- lm_gd(x,y,m0=0, step.size = 0.001, max.iter = 10000) #lm with gd
+l <- lm_gd(x,y,m0=0, step.size = 0.001, max.iter = 5000) #lm with gd
 
 plot(l$d_m, l$m) #plot results
 tail(l) #view results
 
 plot(x,y) #plot
-abline(0, 3.18) #fit linear regression line
+abline(0, 3.09) #fit linear regression line
 
 #calculate the loss function for each value of m 
 
