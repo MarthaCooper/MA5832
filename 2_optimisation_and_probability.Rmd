@@ -199,6 +199,10 @@ $x^{(k+1)} = x^{(k)} - \alpha_kf'(x^{(k)})$
 # Goal is to estimate m in a simple linear regression y = mX using Gradient Descent
 # Won't all fit on this slide so check the .rmd! 
 
+m0 <- 0
+step.size=0.05
+max.iter=100
+changes=0.001
 
 lm_gd<-function(x, # vector of x values
                 y, # vector of y values
@@ -250,12 +254,12 @@ y <- 3*x+0+rnorm(40,0,2)
 plot(x,y) #plot
 
 l <- lm_gd(x,y,m0=0, step.size = 0.001, max.iter = 5000) #lm with gd
-
+head(l)
 plot(l$d_m, l$m) #plot results
 tail(l) #view results
 
 plot(x,y) #plot
-abline(0, 3.09) #fit linear regression line
+abline(0, 2.8) #fit linear regression line
 
 #calculate the loss function for each value of m 
 
@@ -292,7 +296,7 @@ class: inverse, middle, center
 + A continuous random can take on any value within a range of values. 
     + Normal distribution
     + t-distribution
-    + uniform distribution
+    + Uniform distribution
 
 ---
 
@@ -304,6 +308,16 @@ class: inverse, middle, center
 
 ]
 
+---
+
+## Probability Distributions in R
+
++ ```dxxxx``` - Probability Density Function
++ ```pxxxx``` - Cumulative Distribution Function
++ ```qxxxx``` - Quantile Function
++ ```rxxxx``` - Random variate generation
+
+e.g. dnorm, pnorm, qnorm, rnorm
 ---
 
 ## Extra reading/watching
