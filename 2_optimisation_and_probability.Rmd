@@ -229,14 +229,21 @@ lm_gd<-function(x, # vector of x values
       # Step 3: update m according to m = m-L*D_m
       m[i+1,1] <- m[i,1]-step.size*d_m[i,1]
     
-      if(i>1 & all(abs(d_m)< changes)){
+      if(i>1 & abs(d_m[i,1])< changes){
         i=i-1
         break;
       }
     }
 
+      
+  iterations_to_return <- min(i+1, max.iter)
+  # print(paste("Iterations to return: ", iterations_to_return))
   # Return results
-  gd_output <- data.frame("i" = seq(1:max.iter), "m" = m, "d_m" = d_m)
+  gd_output <- data.frame(
+    "i" = seq(1:iterations_to_return), 
+    "m" = head(m, iterations_to_return), 
+    "d_m" = head(d_m, iterations_to_return)
+  )
   return(gd_output)
 }
 
