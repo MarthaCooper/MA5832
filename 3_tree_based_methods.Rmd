@@ -294,7 +294,7 @@ table(preds, testing$Species)
 
 ## Random Forests
 
-+ Similar to bagging trees
++ Improvement over bagged trees
 
 + At each split, a random sample of $m$ predictors is chosen as split candidates from the full set of $P$ predictions
 
