@@ -377,7 +377,7 @@ Note: *not just for trees*, but we will focus on trees here
 
 .center[
 
-<img src="Pics/boost2.jpg" style="width: 80%" />
+<img src="Pics/boost2.png" style="width: 80%" />
 
 ]
 
