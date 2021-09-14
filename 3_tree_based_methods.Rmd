@@ -349,9 +349,9 @@ Note: *not just for trees*, but we will focus on trees here
 
 + Combine weak learners to create strong learners. A weak learning is a classifier that performs poorly, but is still better than a random guess.
 
-+ Weak the weak learners and add them up
++ Weight the weak learners and add them up
 
-+ Sequential - each tree is grown using information from the previous tree. This is an iterative process , where samples in the training set are re-weighted at each iteration, so that the second iteration can correct errors from the model in the first iteration. Trees are added until the training set is predicted perfectly 
++ Sequential - each tree is grown using information from the previous tree. This is an iterative process, where samples in the training set are re-weighted at each iteration, so that the second iteration can correct errors from the model in the first iteration. Trees are added until the training set is predicted perfectly 
 
 *e.g.* AdaBoost & Gradient Boosting
 
@@ -371,7 +371,7 @@ Note: *not just for trees*, but we will focus on trees here
 
 .center[
 
-<img src="Pics/boost1.jpg" style="width: 60%" />
+<img src="Pics/boost1.png" style="width: 60%" />
 
 ]
 
