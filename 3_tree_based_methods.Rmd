@@ -183,12 +183,12 @@ Predicted salaries are given by the **mean value** for players in each region.
 
 ---
 
-## Regression Trees in R
+## CART in R
 
 ```{r, eval = F}
 library(ggplot2) #for plotting
 library(caret) #for trees
-library(rattle)
+library(rattle) #plotting the tree
 
 data(iris) #get data
 head(iris) #view data
@@ -286,7 +286,7 @@ class: inverse, middle, center
 ```{r, eval = F}
 set.seed(6)
 fit2 <- ipred::bagging(Species~., data = training, coob = T, nbagg = 10) #fitted tree with bagging
-preds <<- predict(fit2, testing)
+preds <- predict(fit2, testing)
 table(preds, testing$Species)
 ```
 
