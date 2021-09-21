@@ -33,7 +33,7 @@ mono_accent(
 
 ## Housekeeping
 
-+ Collaborates = **Thursdays 6-7:30pm** 
++ Collaborates = **Tuesdays 6-7:30pm** 
 
 For my Collaborate Sessions, you can get the **slides & R code** for each week on Github:
 
@@ -90,7 +90,7 @@ class: inverse, middle, center
 ---
 ### Classification using hyperplanes
 
-+ A hyperplane in $p$ dimensions is a set of points $(x_1,...X_p)$ that satisfy a linear equation $\beta_0+\beta_1X_1+...+\beta_pX_p = 0$
++ A hyperplane in $p$ dimensions is a set of points $(x_1,...x_p)$ that satisfy a linear equation $\beta_0+\beta_1X_1+...+\beta_pX_p = 0$
 
 + $p = 2$ ?
 
@@ -345,7 +345,7 @@ data("PimaIndiansDiabetes2", package = "mlbench") #diabetes dataset
 ####- outliers
 ####- diagnostic plots 
 head(PimaIndiansDiabetes2)
-summary(PimaIndiansDiabetes2) 
+summary(PimaIndiansDiabetes2)
 df <- na.omit(PimaIndiansDiabetes2)
 summary(df)
 
@@ -387,9 +387,12 @@ preds2 <- predict(svm2, newdata = testdat)
 confusionMatrix(table(preds2, testdat$diabetes))
 
 #Support Vector Machine (radial)
-svm3 <- train(diabetes ~., data = df, method = "svmRadial", 
+svm3 <- train(diabetes ~., 
+              data = df, 
+              method = "svmRadial", 
               trControl = train_control,
-              preProcess = c("center","scale"), tuneLength = 10)
+              preProcess = c("center","scale"), 
+              tuneLength = 10)
 svm3
 preds3 <- predict(svm3, newdata = testdat)
 confusionMatrix(table(preds3, testdat$diabetes))
