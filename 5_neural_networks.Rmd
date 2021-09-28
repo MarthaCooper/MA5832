@@ -1,6 +1,6 @@
 ---
 title: "MA5832: Data Mining & Machine Learning"
-subtitle: "Collaborate Week 4: Neural Networks"
+subtitle: "Collaborate Week 5: Neural Networks"
 author: "Martha Cooper, PhD"
 institute: "JCU Masters of Data Science"
 date: "`r Sys.Date()`"
