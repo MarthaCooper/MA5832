@@ -379,7 +379,7 @@ test_images <- array_reshape(test_images, c(10000, 28 * 28))
 test_images <- test_images / 255 #normalise input to between 0 & 1
 
 
-# Encode y variable into 0 and 1 
+# Encode y variable into 0 and 1. One Hot Encoding
 train_y_mtx <- to_categorical(train_labels)
 test_y_mtx <- to_categorical(test_labels)
 
@@ -405,10 +405,14 @@ model <- network %>%
 plot(model) 
 
 # Prediction
-classes <- network%>% predict_classes(test_images)
+#classes <- network%>% predict_classes(test_images)
+#### Update for Keras v. 2.4 2021
+classes_new <- network%>% predict(test_images) %>% k_argmax() 
 
 # Confusion matrix
-table(test_labels, classes)
+#table(test_labels, classes))
+#### Update for Keras v. 2.4 2021
+table(test_labels, as.matrix(classes_new))
 
 
 # Calculating the loss
